@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Mount the data volume
+mkdir -p /mnt/minecraft
+echo '/dev/disk/by-id/scsi-0DO_Volume_minecraft /mnt/minecraft ext4 defaults,nofail,discard 0 0' | sudo tee -a /etc/fstab
+mount -o discard,defaults,noatime /dev/disk/by-id/scsi-0DO_Volume_minecraft /mnt/minecraft
+
 # Run the minecraft docker instance
 docker run -d \
     --name minecraft-server \
