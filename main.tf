@@ -59,22 +59,44 @@ resource "digitalocean_project" "minecraft" {
   description = "A Minecraft server powered by Terraform."
   purpose     = "Gaming Server"
   environment = "Production"
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-resource "digitalocean_project_resources" "droplet" {
-  project = digitalocean_project.minecraft.id
   resources = [
-    digitalocean_droplet.minecraft.urn
-  ]
-}
-
-resource "digitalocean_project_resources" "others" {
-  project = digitalocean_project.minecraft.id
-  resources = [
+    digitalocean_droplet.minecraft.urn,
     digitalocean_volume.minecraft.urn,
     digitalocean_domain.minecraft.urn
   ]
+}
+
+resource "digitalocean_firewall" "minecraft" {
+  name = "only-22-and-25565"
+
+  droplet_ids = [digitalocean_droplet.minecraft.id]
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "22"
+    source_addresses = [var.your_ipv4]
+  }
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "25565"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  outbound_rule {
+    protocol              = "tcp"
+    port_range            = "1-65535"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  outbound_rule {
+    protocol              = "udp"
+    port_range            = "1-65535"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  outbound_rule {
+    protocol              = "icmp"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
 }

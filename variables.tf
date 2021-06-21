@@ -13,3 +13,7 @@ variable "volume_size" {
 variable "domain" {
   description = "The domain name to update"
 }
+variable "your_ipv4" {
+  description = "Your IPv4 address in cidr notation"
+  default = "192.168.1.0/24"
+}
