@@ -10,3 +10,6 @@ variable "ssh_key" {
 variable "volume_size" {
   description = "The size in GB of the Minecraft data volume"
 }
+variable "domain" {
+  description = "The domain name to update"
+}

@@ -42,13 +42,39 @@ resource "digitalocean_droplet" "minecraft" {
   ]
 }
 
+resource "digitalocean_domain" "minecraft" {
+  name = var.domain
+}
+
+resource "digitalocean_record" "minecraft" {
+  domain = digitalocean_domain.minecraft.name
+  type   = "A"
+  name   = "@"
+  value  = digitalocean_droplet.minecraft.ipv4_address
+  ttl = 60
+}
+
 resource "digitalocean_project" "minecraft" {
   name        = "minecraft"
   description = "A Minecraft server powered by Terraform."
   purpose     = "Gaming Server"
   environment = "Production"
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "digitalocean_project_resources" "droplet" {
+  project = digitalocean_project.minecraft.id
   resources = [
-    digitalocean_droplet.minecraft.urn,
-    digitalocean_volume.minecraft.urn
+    digitalocean_droplet.minecraft.urn
+  ]
+}
+
+resource "digitalocean_project_resources" "others" {
+  project = digitalocean_project.minecraft.id
+  resources = [
+    digitalocean_volume.minecraft.urn,
+    digitalocean_domain.minecraft.urn
   ]
 }
